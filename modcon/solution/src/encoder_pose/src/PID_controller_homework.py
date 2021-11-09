@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[34]:
 
 
 import numpy as np
@@ -35,9 +35,10 @@ def PIDController(
     """
     
     # TODO: these are random values, you have to implement your own PID controller in here
-    omega = np.random.uniform(-8.0, 8.0)
-    e_y = np.random.random()
-    e_int_y = np.random.random()
+    k_p, k_i, k_d, clip = 5, 0.1, 100, 2
+    e_y = y_ref - y_hat
+    e_int_y = np.clip(prev_int_y + e_y * delta_t, -clip, clip)
+    omega = k_p * e_y + k_i * e_int_y + k_d * (e_y - prev_e_y) / delta_t
     
     return [v_0, omega], e_y, e_int_y
 
