@@ -44,14 +44,14 @@ def save_npz(img, boxes, classes):
 
 # some setup
 seed(123)
-MAX_STEPS = 1000
+MAX_STEPS = 4000
 nb_of_steps = 0
 
 # we interate over several maps to get more diverse data
 possible_maps = [
+    "loop_dyn_duckiebots",
     "loop_pedestrians",
     "udem1",
-    "loop_dyn_duckiebots",
     "zigzag_dists"
 ]
 env_id = 0
