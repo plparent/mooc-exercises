@@ -108,6 +108,7 @@ def prepare_segments(segments):
 
 
 
+
 def generate_vote(segment, road_spec):
     p1 = np.array([segment.points[0].x, segment.points[0].y])
     p2 = np.array([segment.points[1].x, segment.points[1].y])
