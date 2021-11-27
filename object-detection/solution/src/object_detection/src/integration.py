@@ -6,7 +6,7 @@
 
 def DT_TOKEN():
     # todo change this to your duckietown token
-    dt_token = "dt1-3nT8KSoxVh4Mgtp11Y5Bun9rChSKCZJKCFb8TjVnWkudqYx-43dzqWFnWd8KBa1yev1g3UKnzVxZkkTbfdmtsz7geHW2q2unyJF3Yx9dxSWLFQMzAT"
+    dt_token = "dt1-3nT8KSoxVh4MdLnE1Bq2mTkhRpbR35G8mmbjExKF7zGm6g4-43dzqWFnWd8KBa1yev1g3UKnzVxZkkTbfYtfGWrfSxeihNZvYVNfNmnCBP28LeqDxL"
     return dt_token
 
 def MODEL_NAME():
@@ -55,9 +55,9 @@ def filter_by_scores(scor):
 # So it is of the shape (leftmost x pixel, topmost y pixel, rightmost x pixel, bottommost y pixel)
 def filter_by_bboxes(bbox):
     # Like in the other cases, return False if the bbox should not be considered.
-    area = abs(bbox[0] - bbox[2]) * abs(bbox[1] - bbox[3])
-    print("area:", area)
-    if area > 7000:
+    max_y = max(bbox[1], bbox[3])
+    print("max:", max_y)
+    if max_y > 320:
         return True
     return False
 
