@@ -43,12 +43,13 @@ def histogram_predict(belief, dt, left_encoder_ticks, right_encoder_ticks, grid_
         d_left = R * alpha * left_encoder_ticks 
         d_right = R * alpha * right_encoder_ticks
         d_A = (d_left + d_right) / 2
-        v = d_A * np.sin(grid_spec['phi'])
         w = (d_left-d_right) / robot_spec['wheel_baseline']
-        
+        v = d_A * np.sin(grid_spec['phi'])
+
         # TODO propagate each centroid forward using the kinematic function
         d_t = v + grid_spec['d']
         phi_t = w + grid_spec['phi']
+        
 
         p_belief = np.zeros(belief.shape)
 
@@ -65,10 +66,10 @@ def histogram_predict(belief, dt, left_encoder_ticks, right_encoder_ticks, grid_
                         or phi_t[i, j] > grid_spec['phi_max']
                     ):
                         continue
-                    
+
                     # TODO Now find the cell where the new mass should be added
-                    i_new = int(grid_spec['d'].shape[0] * (d_t[i, j] - grid_spec['d_min']) / (grid_spec['d_max'] - grid_spec['d_min']))
-                    j_new = int(grid_spec['d'].shape[1] * (phi_t[i, j] - grid_spec['phi_min']) / (grid_spec['phi_max'] - grid_spec['phi_min']))
+                    i_new = int(round(grid_spec['d'].shape[0] * (d_t[i, j] - grid_spec['d_min']) / (grid_spec['d_max'] - grid_spec['d_min']))) - 1
+                    j_new = int(round(grid_spec['d'].shape[1] * (phi_t[i, j] - grid_spec['phi_min']) / (grid_spec['phi_max'] - grid_spec['phi_min']))) - 1
 
                     p_belief[i_new, j_new] += belief[i, j]
 
@@ -105,7 +106,6 @@ def prepare_segments(segments):
 
 
 # In[7]:
-
 
 
 
@@ -146,7 +146,7 @@ def generate_vote(segment, road_spec):
     return d_i, phi_i
 
 
-# In[8]:
+# In[24]:
 
 
 def generate_measurement_likelihood(segments, road_spec, grid_spec):
@@ -162,9 +162,9 @@ def generate_measurement_likelihood(segments, road_spec, grid_spec):
             continue
 
         # TODO find the cell index that corresponds to the measurement d_i, phi_i
-        i = int(grid_spec['d'].shape[0] * (d_i - grid_spec['d_min']) / (grid_spec['d_max'] - grid_spec['d_min']))
-        j = int(grid_spec['d'].shape[1] * (phi_i - grid_spec['phi_min']) / (grid_spec['phi_max'] - grid_spec['phi_min']))
-
+        i = int(round(grid_spec['d'].shape[0] * (d_i - grid_spec['d_min']) / (grid_spec['d_max'] - grid_spec['d_min']))) - 1
+        j = int(round(grid_spec['d'].shape[1] * (phi_i - grid_spec['phi_min']) / (grid_spec['phi_max'] - grid_spec['phi_min']))) - 1
+        
         # Add one vote to that cell
         measurement_likelihood[i, j] += 1
 
@@ -174,7 +174,7 @@ def generate_measurement_likelihood(segments, road_spec, grid_spec):
     return measurement_likelihood
 
 
-# In[9]:
+# In[25]:
 
 
 def histogram_update(belief, segments, road_spec, grid_spec):
@@ -188,8 +188,9 @@ def histogram_update(belief, segments, road_spec, grid_spec):
         # TODO: combine the prior belief and the measurement likelihood to get the posterior belief
         # Don't forget that you may need to normalize to ensure that the output is valid probability distribution
         tmp = belief * measurement_likelihood
-        exp = np.exp(tmp - np.max(tmp))
-        belief = exp / np.sum(exp)
-        #belief = measurement_likelihood
+        if np.sum(tmp) == 0:
+            tmp = belief + measurement_likelihood
+       
+        belief = tmp / np.sum(tmp)
     return (measurement_likelihood, belief)
 
